@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:12.04.5
 RUN apt update
 RUN apt install -y ffmpeg
 COPY stream.sh /usr/bin/stream.sh
