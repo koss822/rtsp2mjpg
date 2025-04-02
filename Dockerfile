@@ -1,6 +1,6 @@
 FROM ubuntu:12.04.5
-RUN apt update
-RUN apt install -y ffmpeg
+RUN apt-get update
+RUN apt-get install -y ffmpeg
 COPY stream.sh /usr/bin/stream.sh
 RUN chmod +x /usr/bin/stream.sh
 COPY ffserver.conf /etc/ffserver.conf
