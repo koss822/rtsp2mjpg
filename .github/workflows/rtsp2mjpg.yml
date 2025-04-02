@@ -2,14 +2,12 @@ name: rtsp2mjpg
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  push: {}
+  pull_request: {}
 
 jobs:
   build-docker-image:
-    runs-on: self-hosted-linux
+    runs-on: rtsp2mjpg
 
     env:
         IMAGE_NAME: rtsp2mjpg
