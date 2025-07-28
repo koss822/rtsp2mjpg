@@ -16,6 +16,7 @@ ENV FFSERVER_LOG_LEVEL "error"
 ENV FFMPEG_LOG_LEVEL  "warning"
 # Set the environment variable to disable output buffering
 ENV PYTHONUNBUFFERED=1
-RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 \
+RUN wget --timeout=15 --tries=3 --retry-connrefused --waitretry=5 -O /usr/local/bin/dumb-init \
+ https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 \
  && chmod +x /usr/local/bin/dumb-init
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/usr/bin/forward.py"]
