@@ -15,13 +15,12 @@ HEALTH_PORT = 8092  # Port to listen on for health check
 PROGRAM = ['/bin/bash', '/usr/bin/stream.sh']
 TIMEOUT = 60
 connections = 0
-lock = threading.Lock()
 connLock = threading.Lock()
 process = None  # To hold the subprocess reference
 
 def handle_client(conn):
     global connections, process, startingp
-    with lock:
+    with connLock:
         connections += 1
         print(f'Active connections: {connections}')
     
