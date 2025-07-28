@@ -5,10 +5,13 @@ import threading
 import os
 import signal
 import time
+import http.server
+import socketserver
 
 HOST = '0.0.0.0'  # all interfaces
 LISTEN_PORT = 8090  # Port to listen on
 TARGET_PORT = 8091  # Port to redirect connections to
+HEALTH_PORT = 8092  # Port to listen on for health check
 PROGRAM = ['/bin/bash', '/usr/bin/stream.sh']
 TIMEOUT = 60
 connections = 0
@@ -23,7 +26,7 @@ def handle_client(conn):
     
     if connections == 1:
         # Start the external program on the target port
-        process = subprocess.Popen(PROGRAM)
+        process = subprocess.Popen(PROGRAM, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print(f"Starting process {process.pid}")
         startingp = True
 
@@ -94,5 +97,29 @@ def main():
             print(f'Connected by {addr}')
             threading.Thread(target=handle_client, args=(conn,)).start()
 
+# Health check HTTP server handler
+class HealthHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"health ok\n")
+
+    def log_message(self, format, *args):
+        # Override to suppress default logging
+        return
+
+
+def run_health_server():
+    with socketserver.TCPServer((HOST, HEALTH_PORT), HealthHandler) as httpd:
+        print(f"Health check server listening on {HOST}:{HEALTH_PORT}...")
+        httpd.serve_forever()
+
+
 if __name__ == "__main__":
-    main()
+    # Start main server in a separate thread
+    main_thread = threading.Thread(target=main, daemon=True)
+    main_thread.start()
+
+    # Run the healthcheck server in the main thread (or you can also run in another thread)
+    run_health_server()
