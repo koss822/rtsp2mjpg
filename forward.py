@@ -66,6 +66,7 @@ def handle_client(conn):
             with connLock:
                 if connections>0:
                     connections -= 1
+                    print(f'Active connections: {connections}')
                     if connections == 0: # Kill only if after one minute still zero connections
                         print(f"Killing process {process.pid}")
                         os.kill(process.pid, signal.SIGTERM)  # Terminate the subprocess
