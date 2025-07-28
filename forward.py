@@ -26,7 +26,7 @@ def handle_client(conn):
     
     if connections == 1:
         # Start the external program on the target port
-        process = subprocess.Popen(PROGRAM, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(PROGRAM, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, preexec_fn=os.setsid)
         print(f"Starting process {process.pid}")
         startingp = True
 
@@ -52,7 +52,15 @@ def handle_client(conn):
         # wait for ffConn to finish
         ffConn.join()
 
+        try:
+            conn.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass  # Socket may already be closed or in invalid state
         conn.close()
+        try:
+            target_conn.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass  # Socket may already be closed or in invalid state
         target_conn.close()
         with connLock:
             if connections>1:
@@ -67,8 +75,7 @@ def handle_client(conn):
                     if connections == 0: # Kill only if after one minute still zero connections
                         try:
                             print(f"Killing process {process.pid}")
-                            process.terminate()
-                            process.wait()
+                            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
                             print("Process terminated.")
                         except Exception as e:
                             print(f"Unable to kill {process.pid} because {e}")
