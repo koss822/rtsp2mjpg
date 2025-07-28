@@ -65,8 +65,13 @@ def handle_client(conn):
                     connections -= 1
                     print(f'Active connections: {connections}')
                     if connections == 0: # Kill only if after one minute still zero connections
-                        print(f"Killing process {process.pid}")
-                        os.kill(process.pid, signal.SIGTERM)  # Terminate the subprocess
+                        try:
+                            print(f"Killing process {process.pid}")
+                            process.terminate()
+                            process.wait()
+                            print("Process terminated.")
+                        except Exception as e:
+                            print(f"Unable to kill {process.pid} because {e}")
 
 
 def forward_data(source, target):
