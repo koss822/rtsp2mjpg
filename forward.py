@@ -42,17 +42,15 @@ def handle_client(conn):
         target_conn.settimeout(TIMEOUT)  # Set timeout on target socket
         
         # Redirect data between the client and the target port
-        threads = []
-        threads.append(threading.Thread(target=forward_data, args=(conn, target_conn)))
-        threads.append(threading.Thread(target=forward_data, args=(target_conn, conn)))
+        clientConn = threading.Thread(target=forward_data, args=(conn, target_conn))
+        ffConn = threading.Thread(target=forward_data, args=(target_conn, conn))
 
         # start all threads
-        for thread in threads:
-            thread.start()
+        clientConn.start()
+        ffConn.start()
 
-        # wait for all threads to finish
-        for thread in threads:
-            thread.join()
+        # wait for ffConn to finish
+        ffConn.join()
 
         conn.close()
         target_conn.close()
