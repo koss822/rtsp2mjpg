@@ -7,7 +7,7 @@ import signal
 import time
 import uuid
 
-HOST = '127.0.0.1'  # localhost
+HOST = '0.0.0.0'  # all interfaces
 LISTEN_PORT = 8090  # Port to listen on
 TARGET_PORT = 8091  # Port to redirect connections to
 PROGRAM = ['/bin/bash', '/usr/bin/stream.sh']
