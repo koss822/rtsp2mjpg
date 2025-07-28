@@ -3,7 +3,7 @@ RUN apt-get update
 RUN apt-get install -y ffmpeg python
 COPY stream.sh /usr/bin/stream.sh
 RUN chmod +x /usr/bin/stream.sh
-COPY stream.sh /usr/bin/forward.py
+COPY forward.py /usr/bin/forward.py
 RUN chmod +x /usr/bin/forward.py
 COPY ffserver.conf /etc/ffserver.conf
 ENV RTSP_URL rtsp://freja.hiof.no:1935/rtplive/definst/hessdalen03.stream
