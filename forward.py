@@ -5,12 +5,12 @@ import threading
 import os
 import signal
 import time
-import uuid
 
 HOST = '0.0.0.0'  # all interfaces
 LISTEN_PORT = 8090  # Port to listen on
 TARGET_PORT = 8091  # Port to redirect connections to
 PROGRAM = ['/bin/bash', '/usr/bin/stream.sh']
+TIMEOUT = 60
 connections = 0
 lock = threading.Lock()
 process = None  # To hold the subprocess reference
@@ -31,9 +31,12 @@ def handle_client(conn):
         time.sleep(5)
         startingp = False
 
+    conn.settimeout(TIMEOUT)  # Set timeout on client socket
+
     # Connect to the target port
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as target_conn:
         target_conn.connect((HOST, TARGET_PORT))
+        target_conn.settimeout(TIMEOUT)  # Set timeout on target socket
         
         # Redirect data between the client and the target port
         threads = []
@@ -70,6 +73,8 @@ def forward_data(source, target):
             target.sendall(data)  # Send the data to the target socket
     except ConnectionAbortedError:
         print("Connection was aborted.")
+    except socket.timeout:
+        print(f"No data received for {TIMEOUT} seconds, closing")
     except Exception as e:
         print(e)
 

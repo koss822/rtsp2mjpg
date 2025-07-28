@@ -3,7 +3,7 @@ RUN apt-get update
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository -y ppa:jblgf0/python
 RUN apt-get update
-RUN apt-get install -y ffmpeg python3.9
+RUN apt-get install -y ffmpeg python3.9 net-tools curl vim
 COPY stream.sh /usr/bin/stream.sh
 RUN chmod +x /usr/bin/stream.sh
 COPY forward.py /usr/bin/forward.py
