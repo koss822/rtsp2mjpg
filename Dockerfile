@@ -14,4 +14,6 @@ ENV FFMPEG_INPUT_OPTS  ""
 ENV FFMPEG_OUTPUT_OPTS  ""
 ENV FFSERVER_LOG_LEVEL "error"
 ENV FFMPEG_LOG_LEVEL  "warning"
+# Set the environment variable to disable output buffering
+ENV PYTHONUNBUFFERED=1
 ENTRYPOINT /usr/bin/forward.py
