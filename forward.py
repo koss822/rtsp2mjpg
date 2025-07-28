@@ -16,6 +16,7 @@ PROGRAM = ['/bin/bash', '/usr/bin/stream.sh']
 TIMEOUT = 60
 connections = 0
 lock = threading.Lock()
+connLock = threading.Lock()
 process = None  # To hold the subprocess reference
 
 def handle_client(conn):
@@ -56,15 +57,18 @@ def handle_client(conn):
 
         conn.close()
         target_conn.close()
-        if connections>1:
-            connections -= 1
+        with connLock:
+            if connections>1:
+                connections -= 1
         print(f'Active connections: {connections}')
         if connections == 1:
             time.sleep(60) # add 1 minute timeout
-            connections -= 1
-            if connections == 0: # Kill only if after one minute still zero connections
-                print(f"Killing process {process.pid}")
-                os.kill(process.pid, signal.SIGTERM)  # Terminate the subprocess
+            with connLock:
+                if connections>0:
+                    connections -= 1
+                    if connections == 0: # Kill only if after one minute still zero connections
+                        print(f"Killing process {process.pid}")
+                        os.kill(process.pid, signal.SIGTERM)  # Terminate the subprocess
 
 
 def forward_data(source, target):
